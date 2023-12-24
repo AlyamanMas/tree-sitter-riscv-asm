@@ -6,7 +6,7 @@
     systems.url = "github:nix-systems/default";
   };
 
-  outputs = { self, nixpkgs, systems, ... } @ inputs:
+  outputs = { nixpkgs, systems, ... }:
     let
       eachSystem = f:
         nixpkgs.lib.genAttrs (import systems) (
@@ -18,11 +18,7 @@
       devShells = eachSystem (pkgs: {
         default = pkgs.mkShell {
           buildInputs = [
-            pkgs.bun
             pkgs.nodejs
-            pkgs.yarn
-            pkgs.nodePackages.typescript
-            pkgs.nodePackages.typescript-language-server
             pkgs.graphviz
             pkgs.tree-sitter
           ];
