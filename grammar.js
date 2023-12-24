@@ -17,7 +17,7 @@ const SUPPORTED_INSTRUCTIONS = {
     I_TYPE: ["addi", "slti", "slti", "xori", "ori", "andi", "slli", "srli", "srai", "lw", "lh", "lb", "lbu", "lhu", "jalr",],
     S_TYPE: ["sw", "sb", "sh"],
     B_TYPE: ["beq", "bne", "blt", "bge", "bltu", "bgeu"],
-    U_TYPE: ["auipc"],
+    U_TYPE: ["auipc", "lui"],
     J_TYPE: ["jal"],
   },
   PSEUDO_INSTRUCTIONS: {
