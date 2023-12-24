@@ -16,7 +16,7 @@ const SUPPORTED_INSTRUCTIONS = {
     R_TYPE: ["xor", "add", "and", "div", "divu", "mul", "sub", "sll", "slt", "sltu", "srl", "sra", "or",],
     I_TYPE: ["addi", "slti", "slti", "xori", "ori", "andi", "slli", "srli", "srai", "lw", "lh", "lb", "lbu", "lhu", "jalr",],
     S_TYPE: ["sw", "sb", "sh"],
-    B_TYPE: [],
+    B_TYPE: ["beq", "bne", "blt", "bge", "bltu", "bgeu"],
     U_TYPE: ["auipc"],
     J_TYPE: ["jal"],
   },
@@ -31,21 +31,23 @@ const SUPPORTED_INSTRUCTIONS = {
 }
 
 // TODO: fix separators: not necessarily comma, could be whitespace
-// TODO: make objects that, for a single type, merge both the pseudo and base types
-I_TYPE_NAMES = [
+const I_TYPE_NAMES = [
   ...SUPPORTED_INSTRUCTIONS.RV32I.I_TYPE,
 ]
-R_TYPE_NAMES = [
+const R_TYPE_NAMES = [
   ...SUPPORTED_INSTRUCTIONS.RV32I.R_TYPE,
 ]
-S_TYPE_NAMES = [
+const S_TYPE_NAMES = [
   ...SUPPORTED_INSTRUCTIONS.RV32I.S_TYPE,
 ]
-U_TYPE_NAMES = [
+const B_TYPE_NAMES = [
+  ...SUPPORTED_INSTRUCTIONS.RV32I.B_TYPE,
+]
+const U_TYPE_NAMES = [
   ...SUPPORTED_INSTRUCTIONS.RV32I.U_TYPE,
   ...SUPPORTED_INSTRUCTIONS.PSEUDO_INSTRUCTIONS.U_TYPE,
 ]
-J_TYPE_NAMES = [
+const J_TYPE_NAMES = [
   ...SUPPORTED_INSTRUCTIONS.RV32I.J_TYPE,
   ...SUPPORTED_INSTRUCTIONS.PSEUDO_INSTRUCTIONS.J_TYPE,
 ]
@@ -148,6 +150,17 @@ module.exports = grammar({
     ),
 
     j_type_name: () => choice(...capitalize_merge_array(J_TYPE_NAMES)),
+
+    b_type_instruction: $ => seq(
+        field('name', $.b_type_name),
+        field('rs1', $.register),
+        ",",
+        field('rs2', $.register),
+        ",",
+        field('label', $.identifier),
+    ),
+
+    b_type_name: () => choice(...capitalize_merge_array(B_TYPE_NAMES)),
 
     label: $ => seq(
       field('name', $.identifier),
