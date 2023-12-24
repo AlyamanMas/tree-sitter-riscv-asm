@@ -85,6 +85,7 @@ module.exports = grammar({
       alias($.i_type_instruction_parens, $.i_type_instruction),
       $.s_type_instruction,
       $.j_type_instruction_label,
+      $.b_type_instruction,
     ),
 
     u_type_instruction: $ => seq(
@@ -175,7 +176,7 @@ module.exports = grammar({
     ),
 
     // TODO: make it more rigorous. Does it accept underscores? dots?
-    identifier: () => /[A-Za-z]+[A-Za-z0-9]+/,
+    identifier: () => prec(-2, /[A-Za-z]+[A-Za-z0-9]+/),
 
     _comment: () => token(prec(-11, /#.*/)),
   }
