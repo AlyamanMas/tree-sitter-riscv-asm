@@ -152,12 +152,12 @@ module.exports = grammar({
     j_type_name: () => choice(...capitalize_merge_array(J_TYPE_NAMES)),
 
     b_type_instruction: $ => seq(
-        field('name', $.b_type_name),
-        field('rs1', $.register),
-        ",",
-        field('rs2', $.register),
-        ",",
-        field('label', $.identifier),
+      field('name', $.b_type_name),
+      field('rs1', $.register),
+      ",",
+      field('rs2', $.register),
+      ",",
+      field('label', $.identifier),
     ),
 
     b_type_name: () => choice(...capitalize_merge_array(B_TYPE_NAMES)),
