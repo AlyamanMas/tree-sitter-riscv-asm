@@ -10,14 +10,15 @@ const capitalize_merge_array = (array) => {
 const WHITESPACE = /[\u0009-\u000D\u0085\u2028\u2029\u0020\u3000\u1680\u2000-\u2006\u2008-\u200A\u205F\u00A0\u2007\u202F]+/;
 
 // TODO: check base from pseudo
+// TODO: Also check that each extension has the right instructions
 const SUPPORTED_INSTRUCTIONS = {
   RV32I: {
     R_TYPE: ["xor", "add", "and", "div", "divu", "mul", "sub", "sll", "slt", "sltu", "srl", "sra", "or",],
-    I_TYPE: ["addi", "slti", "slti", "xori", "ori", "andi", "slli", "srli", "srai", "lw", "lh", "lb", "lbu", "lhu",],
+    I_TYPE: ["addi", "slti", "slti", "xori", "ori", "andi", "slli", "srli", "srai", "lw", "lh", "lb", "lbu", "lhu", "jalr",],
     S_TYPE: ["sw", "sb", "sh"],
     B_TYPE: [],
     U_TYPE: ["auipc"],
-    J_TYPE: [],
+    J_TYPE: ["jal"],
   },
   PSEUDO_INSTRUCTIONS: {
     R_TYPE: [],
@@ -25,7 +26,7 @@ const SUPPORTED_INSTRUCTIONS = {
     S_TYPE: [],
     B_TYPE: [],
     U_TYPE: ["li"],
-    J_TYPE: [],
+    J_TYPE: ["j"],
   }
 }
 
@@ -43,6 +44,10 @@ S_TYPE_NAMES = [
 U_TYPE_NAMES = [
   ...SUPPORTED_INSTRUCTIONS.RV32I.U_TYPE,
   ...SUPPORTED_INSTRUCTIONS.PSEUDO_INSTRUCTIONS.U_TYPE,
+]
+J_TYPE_NAMES = [
+  ...SUPPORTED_INSTRUCTIONS.RV32I.J_TYPE,
+  ...SUPPORTED_INSTRUCTIONS.PSEUDO_INSTRUCTIONS.J_TYPE,
 ]
 
 const REGISTERS = {
@@ -77,6 +82,7 @@ module.exports = grammar({
       $.i_type_instruction,
       alias($.i_type_instruction_parens, $.i_type_instruction),
       $.s_type_instruction,
+      $.j_type_instruction_label,
     ),
 
     u_type_instruction: $ => seq(
@@ -120,6 +126,8 @@ module.exports = grammar({
       ")",
     ),
 
+    // TODO: add i_type_instruction with labels for JAL
+
     i_type_name: () => choice(...capitalize_merge_array(I_TYPE_NAMES)),
 
     s_type_instruction: $ => seq(
@@ -134,6 +142,12 @@ module.exports = grammar({
 
     s_type_name: () => choice(...capitalize_merge_array(S_TYPE_NAMES)),
 
+    j_type_instruction_label: $ => seq(
+      field('name', $.j_type_name),
+      field('label', $.identifier),
+    ),
+
+    j_type_name: () => choice(...capitalize_merge_array(J_TYPE_NAMES)),
 
     label: $ => seq(
       field('name', $.identifier),
