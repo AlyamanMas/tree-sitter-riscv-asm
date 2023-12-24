@@ -86,6 +86,7 @@ module.exports = grammar({
       alias($.i_type_instruction_parens, $.i_type_instruction),
       $.s_type_instruction,
       $.j_type_instruction_label,
+      $.j_type_instruction,
       $.b_type_instruction,
     ),
 
@@ -148,6 +149,13 @@ module.exports = grammar({
 
     j_type_instruction_label: $ => seq(
       field('name', $.j_type_name),
+      field('label', $.identifier),
+    ),
+
+    j_type_instruction: $ => seq(
+      field('name', $.j_type_name),
+      field('rd', $.register),
+      ",",
       field('label', $.identifier),
     ),
 
