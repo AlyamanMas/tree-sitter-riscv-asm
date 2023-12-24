@@ -5,7 +5,8 @@
   "main": "bindings/node",
   "scripts": {
     "test": "tree-sitter generate && tree-sitter test",
-    "html": "tree-sitter generate && tree-sitter parse -D test.s && xdg-open log.html"
+    "html": "tree-sitter generate && tree-sitter parse -D test.s && xdg-open log.html",
+    "parse": "tree-sitter generate & tree-sitter parse test.s"
   },
   "keywords": [
     "tree-sitter",
