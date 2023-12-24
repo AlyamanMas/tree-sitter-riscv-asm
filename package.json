@@ -4,7 +4,8 @@
   "description": "A tree-sitter parser for RISC-V assembly",
   "main": "bindings/node",
   "scripts": {
-    "test": "tree-sitter generate && tree-sitter test"
+    "test": "tree-sitter generate && tree-sitter test",
+    "html": "tree-sitter generate && tree-sitter parse -D test.s && xdg-open log.html"
   },
   "keywords": [
     "tree-sitter",

@@ -6,3 +6,4 @@ Cargo.toml
 example_file
 test.asm
 node_modules
+test.s
