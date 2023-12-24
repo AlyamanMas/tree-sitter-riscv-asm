@@ -6,6 +6,7 @@ const capitalize_merge_array = (array) => {
   return new_arr;
 }
 
+// Taken from the fish tree-sitter parser
 const WHITESPACE = /[\u0009-\u000D\u0085\u2028\u2029\u0020\u3000\u1680\u2000-\u2006\u2008-\u200A\u205F\u00A0\u2007\u202F]+/;
 
 // TODO: check base from pseudo
@@ -15,7 +16,7 @@ const SUPPORTED_INSTRUCTIONS = {
     I_TYPE: ["addi", "slti", "slti", "xori", "ori", "andi", "slli", "srli", "srai", "lw", "lh", "lb", "lbu", "lhu",],
     S_TYPE: ["sw", "sb", "sh"],
     B_TYPE: [],
-    U_TYPE: [],
+    U_TYPE: ["auipc"],
     J_TYPE: [],
   },
   PSEUDO_INSTRUCTIONS: {
@@ -23,7 +24,7 @@ const SUPPORTED_INSTRUCTIONS = {
     I_TYPE: [],
     S_TYPE: [],
     B_TYPE: [],
-    U_TYPE: [],
+    U_TYPE: ["li"],
     J_TYPE: [],
   }
 }
@@ -38,6 +39,10 @@ R_TYPE_NAMES = [
 ]
 S_TYPE_NAMES = [
   ...SUPPORTED_INSTRUCTIONS.RV32I.S_TYPE,
+]
+U_TYPE_NAMES = [
+  ...SUPPORTED_INSTRUCTIONS.RV32I.U_TYPE,
+  ...SUPPORTED_INSTRUCTIONS.PSEUDO_INSTRUCTIONS.U_TYPE,
 ]
 
 const REGISTERS = {
@@ -81,7 +86,7 @@ module.exports = grammar({
       field('immediate', $.immediate),
     ),
 
-    u_type_name: () => choice(...capitalize_merge_array(["li", "auipc"])),
+    u_type_name: () => choice(...capitalize_merge_array(U_TYPE_NAMES)),
 
     // TODO: check if commas are optional or not
     r_type_instruction: $ => seq(
