@@ -28,6 +28,7 @@ const SUPPORTED_INSTRUCTIONS = {
   }
 }
 
+// TODO: fix separators: not necessarily comma, could be whitespace
 // TODO: make objects that, for a single type, merge both the pseudo and base types
 I_TYPE_NAMES = [
   ...SUPPORTED_INSTRUCTIONS.RV32I.I_TYPE,
@@ -141,6 +142,7 @@ module.exports = grammar({
       /-?\d+/
     ),
 
+    // TODO: make it more rigorous. Does it accept underscores? dots?
     identifier: () => /[A-Za-z]+[A-Za-z0-9]+/,
 
     _comment: () => token(prec(-11, /#.*/)),

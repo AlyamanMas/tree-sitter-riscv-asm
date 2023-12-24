@@ -1,0 +1,8 @@
+bindings
+src
+binding.gyp
+log.*
+Cargo.toml
+example_file
+test.asm
+node_modules
