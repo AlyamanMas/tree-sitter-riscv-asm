@@ -63,6 +63,7 @@ const REGISTERS = {
 module.exports = grammar({
   name: 'riscv_asm',
 
+  // TODO: Make it so instructions can't be split across lines
   extras: $ => [
     $._comment,
     WHITESPACE,
@@ -175,8 +176,7 @@ module.exports = grammar({
       /-?\d+/
     ),
 
-    // TODO: make it more rigorous. Does it accept underscores? dots?
-    identifier: () => prec(-2, /[A-Za-z]+[A-Za-z0-9]+/),
+    identifier: () => prec(-2, /[A-Za-z._$]+[A-Za-z0-9._$]+/),
 
     _comment: () => token(prec(-11, /#.*/)),
   }
