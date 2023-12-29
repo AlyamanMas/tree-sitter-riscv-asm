@@ -15,25 +15,25 @@ main:
 (source_file
   (label
     name: (identifier))
-  (u_type_instruction
-    name: (u_type_name)
-    rd: (register)
-    immediate: (immediate))
-  (u_type_instruction
-    name: (u_type_name)
-    rd: (register)
-    immediate: (immediate))
-  (r_type_instruction
-    name: (r_type_name)
-    rd: (register)
-    rs1: (register)
-    rs2: (register))
-  (u_type_instruction
-    name: (u_type_name)
-    rd: (register)
-    immediate: (immediate))
-  (r_type_instruction
-    name: (r_type_name)
-    rd: (register)
-    rs1: (register)
-    rs2: (register)))
+  (instruction
+    name: (instruction_name)
+    (register)
+    (immediate))
+  (instruction
+    name: (instruction_name)
+    (register)
+    (immediate))
+  (instruction
+    name: (instruction_name)
+    (register)
+    (register)
+    (register))
+  (instruction
+    name: (instruction_name)
+    (register)
+    (immediate))
+  (instruction
+    name: (instruction_name)
+    (register)
+    (register)
+    (register)))

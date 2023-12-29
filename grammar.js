@@ -1,4 +1,8 @@
-const capitalize_merge_array = (array) => {
+/**
+* @param {string[]} array
+* @returns {string[]}
+*/
+function capitalize_merge_array(array) {
   let new_arr = [...array];
   for (const i of array) {
     new_arr.push(i.toUpperCase());
@@ -7,7 +11,8 @@ const capitalize_merge_array = (array) => {
 }
 
 // Taken from the fish tree-sitter parser
-const WHITESPACE = /[\u0009-\u000D\u0085\u2028\u2029\u0020\u3000\u1680\u2000-\u2006\u2008-\u200A\u205F\u00A0\u2007\u202F]+/;
+// const WHITESPACE = /[\u0009-\u000D\u0085\u2028\u2029\u0020\u3000\u1680\u2000-\u2006\u2008-\u200A\u205F\u00A0\u2007\u202F]+/;
+const WHITESPACE = /[\t ,]+/;
 
 // TODO: check base from pseudo
 // TODO: Also check that each extension has the right instructions
@@ -65,112 +70,43 @@ module.exports = grammar({
 
   // TODO: Make it so instructions can't be split across lines
   extras: $ => [
-    $._comment,
     WHITESPACE,
+    $._comment,
   ],
   // make instructions left associative and comments right associative
   // use alias for instructions with multiple way of doing them
   rules: {
     // TODO: add the actual grammar rules
-    source_file: $ => repeat($._definition),
+    source_file: $ => repeat(seq(optional($._definition), "\n")),
 
     _definition: $ => choice(
-      $._instruction,
-      $.label
+      $.instruction,
+      $.label,
     ),
 
-    _instruction: $ => choice(
-      $.u_type_instruction,
-      $.r_type_instruction,
-      $.i_type_instruction,
-      alias($.i_type_instruction_parens, $.i_type_instruction),
-      $.s_type_instruction,
-      $.j_type_instruction_label,
-      $.j_type_instruction,
-      $.b_type_instruction,
-    ),
+    instruction: $ => prec.left(10, seq(
+      field('name', $.instruction_name),
+      repeat(choice(
+        $.immediate,
+        $.register,
+        seq(
+          $.immediate,
+          "(",
+          $.register,
+          ")",
+        ),
+        $.identifier,
+      ))
+    )),
 
-    u_type_instruction: $ => seq(
-      field('name', $.u_type_name),
-      field('rd', $.register),
-      ",",
-      field('immediate', $.immediate),
-    ),
-
-    u_type_name: () => choice(...capitalize_merge_array(U_TYPE_NAMES)),
-
-    // TODO: check if commas are optional or not
-    r_type_instruction: $ => seq(
-      field('name', $.r_type_name),
-      field('rd', $.register),
-      ",",
-      field('rs1', $.register),
-      ",",
-      field('rs2', $.register),
-    ),
-
-    r_type_name: () => choice(...capitalize_merge_array(R_TYPE_NAMES)),
-
-    i_type_instruction: $ => seq(
-      field('name', $.i_type_name),
-      field('rd', $.register),
-      ",",
-      field('rs1', $.register),
-      ",",
-      field('immediate', $.immediate),
-    ),
-
-    // if blogging write about this
-    i_type_instruction_parens: $ => seq(
-      field('name', $.i_type_name),
-      field('rd', $.register),
-      ",",
-      field('immediate', $.immediate),
-      "(",
-      field('rs1', $.register),
-      ")",
-    ),
-
-    // TODO: add i_type_instruction with labels for JAL
-
-    i_type_name: () => choice(...capitalize_merge_array(I_TYPE_NAMES)),
-
-    s_type_instruction: $ => seq(
-      field('name', $.s_type_name),
-      field('rs1', $.register),
-      ",",
-      field('immediate', $.immediate),
-      "(",
-      field('rs2', $.register),
-      ")",
-    ),
-
-    s_type_name: () => choice(...capitalize_merge_array(S_TYPE_NAMES)),
-
-    j_type_instruction_label: $ => seq(
-      field('name', $.j_type_name),
-      field('label', $.identifier),
-    ),
-
-    j_type_instruction: $ => seq(
-      field('name', $.j_type_name),
-      field('rd', $.register),
-      ",",
-      field('label', $.identifier),
-    ),
-
-    j_type_name: () => choice(...capitalize_merge_array(J_TYPE_NAMES)),
-
-    b_type_instruction: $ => seq(
-      field('name', $.b_type_name),
-      field('rs1', $.register),
-      ",",
-      field('rs2', $.register),
-      ",",
-      field('label', $.identifier),
-    ),
-
-    b_type_name: () => choice(...capitalize_merge_array(B_TYPE_NAMES)),
+    instruction_name: $ => token(choice(...capitalize_merge_array([
+      ...I_TYPE_NAMES,
+      ...R_TYPE_NAMES,
+      ...S_TYPE_NAMES,
+      ...B_TYPE_NAMES,
+      ...U_TYPE_NAMES,
+      ...J_TYPE_NAMES,
+    ]))),
 
     label: $ => seq(
       field('name', $.identifier),
@@ -186,6 +122,6 @@ module.exports = grammar({
 
     identifier: () => prec(-2, /[A-Za-z._$]+[A-Za-z0-9._$]+/),
 
-    _comment: () => token(prec(-11, /#.*/)),
+    _comment: () => token(prec.right(10, /#.*/)),
   }
 });
