@@ -10,8 +10,6 @@ function capitalize_merge_array(array) {
   return new_arr;
 }
 
-// Taken from the fish tree-sitter parser
-// const WHITESPACE = /[\u0009-\u000D\u0085\u2028\u2029\u0020\u3000\u1680\u2000-\u2006\u2008-\u200A\u205F\u00A0\u2007\u202F]+/;
 const WHITESPACE = /[\t ,\n]+/;
 
 // TODO: check base from pseudo
@@ -35,7 +33,6 @@ const SUPPORTED_INSTRUCTIONS = {
   }
 }
 
-// TODO: fix separators: not necessarily comma, could be whitespace
 const I_TYPE_NAMES = [
   ...SUPPORTED_INSTRUCTIONS.RV32I.I_TYPE,
 ]
@@ -69,22 +66,18 @@ const REGISTERS = {
   NORMAL_REGISTERS: [
     "zero", "ra", "sp", "gp", "tp", "t0", "t1", "t2", "t3", "t4", "t5", "t6", "a0", "a1", "a2", "a3", "a4", "a5", "a6", "a7", "s0", "s1", "s2", "s3", "s4", "s5", "s6", "s7", "s8", "s9", "s10", "s11", "x0", "x2", "x3", "x4", "x5", "x6", "x7", "x8", "x9", "x10", "x11", "x12", "x13", "x14", "x14", "x15", "x17", "x18", "x19", "x20", "x21", "x22", "x23", "x24", "x25", "x26", "x27", "x28", "x29", "x30", "x31",],
   FLOAT_REGISTERS: [
-    // TODO
+    // TODO: add
   ],
 }
 
 module.exports = grammar({
   name: 'riscv_asm',
 
-  // TODO: Make it so instructions can't be split across lines
   extras: $ => [
     WHITESPACE,
     $._comment,
   ],
-  // make instructions left associative and comments right associative
-  // use alias for instructions with multiple way of doing them
   rules: {
-    // TODO: add the actual grammar rules
     source_file: $ => repeat($.text_section),
 
     _definition: $ => choice(
@@ -107,7 +100,7 @@ module.exports = grammar({
       ))
     )),
 
-    instruction_name: $ => token(choice(...capitalize_merge_array(
+    instruction_name: () => token(choice(...capitalize_merge_array(
       INSTRUCTIONS_ARR
     ))),
 
