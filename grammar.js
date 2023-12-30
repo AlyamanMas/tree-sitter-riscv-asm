@@ -12,7 +12,7 @@ function capitalize_merge_array(array) {
 
 // Taken from the fish tree-sitter parser
 // const WHITESPACE = /[\u0009-\u000D\u0085\u2028\u2029\u0020\u3000\u1680\u2000-\u2006\u2008-\u200A\u205F\u00A0\u2007\u202F]+/;
-const WHITESPACE = /[\t ,]+/;
+const WHITESPACE = /[\t ,\n]+/;
 
 // TODO: check base from pseudo
 // TODO: Also check that each extension has the right instructions
@@ -56,6 +56,14 @@ const J_TYPE_NAMES = [
   ...SUPPORTED_INSTRUCTIONS.RV32I.J_TYPE,
   ...SUPPORTED_INSTRUCTIONS.PSEUDO_INSTRUCTIONS.J_TYPE,
 ]
+const INSTRUCTIONS_ARR = [
+  ...I_TYPE_NAMES,
+  ...R_TYPE_NAMES,
+  ...S_TYPE_NAMES,
+  ...B_TYPE_NAMES,
+  ...U_TYPE_NAMES,
+  ...J_TYPE_NAMES,
+]
 
 const REGISTERS = {
   NORMAL_REGISTERS: [
@@ -77,7 +85,7 @@ module.exports = grammar({
   // use alias for instructions with multiple way of doing them
   rules: {
     // TODO: add the actual grammar rules
-    source_file: $ => repeat(seq(optional($._definition), "\n")),
+    source_file: $ => repeat($.text_section),
 
     _definition: $ => choice(
       $.instruction,
@@ -99,14 +107,9 @@ module.exports = grammar({
       ))
     )),
 
-    instruction_name: $ => token(choice(...capitalize_merge_array([
-      ...I_TYPE_NAMES,
-      ...R_TYPE_NAMES,
-      ...S_TYPE_NAMES,
-      ...B_TYPE_NAMES,
-      ...U_TYPE_NAMES,
-      ...J_TYPE_NAMES,
-    ]))),
+    instruction_name: $ => token(choice(...capitalize_merge_array(
+      INSTRUCTIONS_ARR
+    ))),
 
     label: $ => seq(
       field('name', $.identifier),
@@ -123,5 +126,15 @@ module.exports = grammar({
     identifier: () => prec(-2, /[A-Za-z._$]+[A-Za-z0-9._$]+/),
 
     _comment: () => token(prec.right(10, /#.*/)),
+
+    text_section: $ => prec.right(choice(
+      seq(
+        ".text\n",
+        repeat(seq(optional($._definition), "\n")),
+      ),
+      seq(
+        repeat1(seq($._definition, "\n")),
+      ),
+    )),
   }
 });
