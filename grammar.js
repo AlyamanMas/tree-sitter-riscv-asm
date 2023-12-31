@@ -122,7 +122,7 @@ module.exports = grammar({
 
     text_section: $ => prec.right(choice(
       seq(
-        ".text\n",
+        ".text",
         repeat(seq(optional($._definition), "\n")),
       ),
       seq(
