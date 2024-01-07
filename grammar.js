@@ -12,55 +12,7 @@ function capitalize_merge_array(array) {
 
 const WHITESPACE = /[\t ,\n]+/;
 
-// TODO: check base from pseudo
-// TODO: Also check that each extension has the right instructions
-const SUPPORTED_INSTRUCTIONS = {
-  RV32I: {
-    R_TYPE: ["xor", "add", "and", "div", "divu", "mul", "sub", "sll", "slt", "sltu", "srl", "sra", "or",],
-    I_TYPE: ["addi", "slti", "slti", "xori", "ori", "andi", "slli", "srli", "srai", "lw", "lh", "lb", "lbu", "lhu", "jalr",],
-    S_TYPE: ["sw", "sb", "sh"],
-    B_TYPE: ["beq", "bne", "blt", "bge", "bltu", "bgeu"],
-    U_TYPE: ["auipc", "lui"],
-    J_TYPE: ["jal"],
-  },
-  PSEUDO_INSTRUCTIONS: {
-    R_TYPE: [],
-    I_TYPE: [],
-    S_TYPE: [],
-    B_TYPE: [],
-    U_TYPE: ["li"],
-    J_TYPE: ["j"],
-  }
-}
-
-const I_TYPE_NAMES = [
-  ...SUPPORTED_INSTRUCTIONS.RV32I.I_TYPE,
-]
-const R_TYPE_NAMES = [
-  ...SUPPORTED_INSTRUCTIONS.RV32I.R_TYPE,
-]
-const S_TYPE_NAMES = [
-  ...SUPPORTED_INSTRUCTIONS.RV32I.S_TYPE,
-]
-const B_TYPE_NAMES = [
-  ...SUPPORTED_INSTRUCTIONS.RV32I.B_TYPE,
-]
-const U_TYPE_NAMES = [
-  ...SUPPORTED_INSTRUCTIONS.RV32I.U_TYPE,
-  ...SUPPORTED_INSTRUCTIONS.PSEUDO_INSTRUCTIONS.U_TYPE,
-]
-const J_TYPE_NAMES = [
-  ...SUPPORTED_INSTRUCTIONS.RV32I.J_TYPE,
-  ...SUPPORTED_INSTRUCTIONS.PSEUDO_INSTRUCTIONS.J_TYPE,
-]
-const INSTRUCTIONS_ARR = [
-  ...I_TYPE_NAMES,
-  ...R_TYPE_NAMES,
-  ...S_TYPE_NAMES,
-  ...B_TYPE_NAMES,
-  ...U_TYPE_NAMES,
-  ...J_TYPE_NAMES,
-]
+const INSTRUCTIONS = ["xor", "add", "and", "div", "divu", "mul", "sub", "sll", "slt", "sltu", "srl", "sra", "or", "addi", "slti", "slti", "xori", "ori", "andi", "slli", "srli", "srai", "lw", "lh", "lb", "lbu", "lhu", "jalr", "sw", "sb", "sh", "beq", "bne", "blt", "bge", "bltu", "bgeu", "auipc", "lui", "jal", "ecall", "li",];
 
 const REGISTERS = {
   NORMAL_REGISTERS: [
@@ -101,7 +53,7 @@ module.exports = grammar({
     )),
 
     instruction_name: () => token(choice(...capitalize_merge_array(
-      INSTRUCTIONS_ARR
+      INSTRUCTIONS
     ))),
 
     label: $ => seq(
