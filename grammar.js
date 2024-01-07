@@ -112,7 +112,7 @@ module.exports = grammar({
     register: () => prec(10, choice(...REGISTERS.NORMAL_REGISTERS)),
 
     immediate: () => choice(
-      /-?0x\d+/,
+      /-?0x[0-9abcdefABCDEF]+/,
       /-?\d+/
     ),
 
