@@ -12,6 +12,7 @@ function capitalize_merge_array(array) {
 
 const WHITESPACE = /[\t ,\n]+/;
 
+// TODO: add more instructions
 const INSTRUCTIONS = ["xor", "add", "and", "div", "divu", "mul", "sub", "sll", "slt", "sltu", "srl", "sra", "or", "addi", "slti", "slti", "xori", "ori", "andi", "slli", "srli", "srai", "lw", "lh", "lb", "lbu", "lhu", "jalr", "sw", "sb", "sh", "beq", "bne", "blt", "bge", "bltu", "bgeu", "auipc", "lui", "jal", "ecall", "li",];
 
 const REGISTERS = {
@@ -29,79 +30,103 @@ module.exports = grammar({
     WHITESPACE,
     $._comment,
   ],
+
   rules: {
-    source_file: $ => repeat(
-      choice(
-        $.text_section,
-        $.data_section,
-      ),
-    ),
-
-    _definition: $ => choice(
-      $.instruction,
-      $.label,
-    ),
-
-    instruction: $ => prec.left(10, seq(
-      field('name', $.instruction_name),
-      repeat(choice(
-        $.immediate,
-        $.register,
-        seq(
-          $.immediate,
-          "(",
-          $.register,
-          ")",
+    source_file: $ =>
+      repeat(
+        choice(
+          $.text_section,
+          $.data_section,
         ),
-        $.identifier,
-      ))
-    )),
+      ),
 
-    instruction_name: () => token(choice(...capitalize_merge_array(
-      INSTRUCTIONS
-    ))),
+    _definition: $ =>
+      choice(
+        $.instruction,
+        $.label,
+      ),
 
-    label: $ => seq(
-      field('name', $.identifier),
-      ":",
-    ),
+    instruction: $ =>
+      prec.left(
+        10,
+        seq(
+          field('name', $.instruction_name),
+          repeat(choice(
+            $.immediate,
+            $.register,
+            seq(
+              $.immediate,
+              "(",
+              $.register,
+              ")",
+            ),
+            $.identifier,
+          ))
+        )
+      ),
 
-    register: () => prec(10, choice(...REGISTERS.NORMAL_REGISTERS)),
+    instruction_name: () =>
+      token(
+        choice(...capitalize_merge_array(INSTRUCTIONS))
+      ),
 
-    immediate: () => choice(
-      /-?0x[0-9abcdefABCDEF]+/,
-      /-?\d+/
-    ),
+    label: $ =>
+      seq(
+        field('name', $.identifier),
+        ":",
+      ),
+
+    // TODO: Maybe turn into token?
+    register: () =>
+      prec(
+        10,
+        choice(...REGISTERS.NORMAL_REGISTERS)
+      ),
+
+    immediate: () =>
+      choice(
+        /-?0x[0-9abcdefABCDEF]+/,
+        /-?\d+/
+      ),
 
     identifier: () => prec(-2, /[A-Za-z._$]+[A-Za-z0-9._$]+/),
 
     _comment: () => token(prec.right(10, /#.*/)),
 
-    text_section: $ => prec.right(choice(
-      seq(
-        ".text",
-        repeat(seq(optional($._definition), "\n")),
+    text_section: $ =>
+      prec.right(
+        choice(
+          seq(
+            ".text",
+            repeat(
+              seq(optional($._definition), "\n")
+            ),
+          ),
+          seq(
+            repeat1(
+              seq($._definition, "\n")
+            ),
+          ),
+        )
       ),
-      seq(
-        repeat1(seq($._definition, "\n")),
-      ),
-    )),
 
     string: () => /"[^"]*"/,
 
     char: () => /'.*'/,
 
-    _expression: $ => choice(
-      $.string,
-      $.immediate,
-      $.char,
-    ),
+    _expression: $ =>
+      choice(
+        $.string,
+        $.immediate,
+        $.char,
+      ),
 
-    store_directive: $ => seq(
-      choice(".ascii", ".asciz", ".byte", ".double", ".dword", ".float", ".half", ".string", ".word"),
-      repeat($._expression),
-      "\n",
-    ),
+    store_directive: $ =>
+      seq(
+        choice(".ascii", ".asciz", ".byte", ".double", ".dword", ".float", ".half", ".string", ".word"),
+        repeat($._expression),
+        "\n",
+      ),
 
     constant: $ =>
       prec(
@@ -112,17 +137,19 @@ module.exports = grammar({
         ),
       ),
 
-    align: $ => seq(
-      ".align",
-      $._expression,
-      "\n",
-    ),
+    align: $ =>
+      seq(
+        ".align",
+        $._expression,
+        "\n",
+      ),
 
-    space: $ => seq(
-      ".space",
-      $._expression,
-      "\n",
-    ),
+    space: $ =>
+      seq(
+        ".space",
+        $._expression,
+        "\n",
+      ),
 
     _data_toplvl: $ =>
       choice(
