@@ -110,9 +110,11 @@ module.exports = grammar({
         )
       ),
 
+    // TODO: let it support \"
     string: () => /"[^"]*"/,
 
-    char: () => /'.*'/,
+    // TODO: let it support \'
+    char: () => /'[^']*'/,
 
     _expression: $ =>
       choice(
