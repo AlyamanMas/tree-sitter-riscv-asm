@@ -30,7 +30,12 @@ module.exports = grammar({
     $._comment,
   ],
   rules: {
-    source_file: $ => repeat($.text_section),
+    source_file: $ => repeat(
+      choice(
+        $.text_section,
+        $.data_section,
+      ),
+    ),
 
     _definition: $ => choice(
       $.instruction,
@@ -81,5 +86,59 @@ module.exports = grammar({
         repeat1(seq($._definition, "\n")),
       ),
     )),
+
+    string: () => /"[^"]*"/,
+
+    char: () => /'.*'/,
+
+    _expression: $ => choice(
+      $.string,
+      $.immediate,
+      $.char,
+    ),
+
+    store_directive: $ => seq(
+      choice(".ascii", ".asciz", ".byte", ".double", ".dword", ".float", ".half", ".string", ".word"),
+      repeat($._expression),
+      "\n",
+    ),
+
+    constant: $ =>
+      prec(
+        10,
+        seq(
+          $.label,
+          $.store_directive,
+        ),
+      ),
+
+    align: $ => seq(
+      ".align",
+      $._expression,
+      "\n",
+    ),
+
+    space: $ => seq(
+      ".space",
+      $._expression,
+      "\n",
+    ),
+
+    _data_toplvl: $ =>
+      choice(
+        $.align,
+        $.space,
+        $.constant,
+        $.store_directive,
+        $.label
+      ),
+
+    data_section: $ =>
+      prec.right(
+        seq(
+          ".data",
+          repeat($._data_toplvl),
+        ),
+      ),
   }
 });

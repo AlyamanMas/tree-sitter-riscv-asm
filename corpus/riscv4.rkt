@@ -8,7 +8,9 @@ Sections
 	hello: .word 0x23
 	s1: .ascii "hello world", "wow"
 	.asciz "hello", "wow"
+  .space 0x3
 	s3: .byte 0x28, 'h', "hlow"
+  s4:
 .text 
 setup:
 	li	s0, 0xFFFF9796
@@ -23,30 +25,39 @@ main:
 (source_file 
   (data_section
     (constant
-      name: (identifier)
-      (word
+      (label 
+        name: (identifier))
+      (store_directive
         (immediate)
         (immediate)
         (char)))
-    (align)
+    (align
+      (immediate))
     (constant
-      name: (identifier)
-      (word 
+      (label
+        name: (identifier))
+      (store_directive 
         (immediate)))
     (constant 
-      name: (identifier)
-      (ascii
+      (label
+        name: (identifier))
+      (store_directive
         (string)
         (string)))
-    (asciz
+    (store_directive
       (string)
       (string))
+    (space
+      (immediate))
     (constant 
-      name: (identifier)
-      (byte 
+      (label
+        name: (identifier))
+      (store_directive 
         (immediate)
         (char)
-        (string))))
+        (string)))
+    (label 
+      name: (identifier)))
   (text_section
     (label
       name: (identifier))
